@@ -12,8 +12,8 @@ class AddNewCustomerLocators:
     CITY = (By.ID, "City")
     STATE = (By.ID, "StateOrRegion")
     GENDER = (By.CSS_SELECTOR, "input[name='gender'][value='male']")
-    ADD_TO_PROMOTIONAL_LIST = (By.NAME, "promos-name")
-    SUBMIT_BUTTON = (By.CLASS_NAME, "btn-primary")
+    PROMO_CHECKBOX = (By.NAME, "promos-name")
+    SUBMIT_BUTTON =  (By.XPATH, "//button[@type='submit']")
 
 class LogoutLocators:
     LOG_OUT = (By.CLASS_NAME, "nav-link")

@@ -1,13 +1,19 @@
+from sre_parse import State
+
 import pytest
 from selenium import webdriver
 from ActionPage.login_page import LoginPage
+from selenium.webdriver.chrome.options import Options
 from ActionPage.add_new_customer_page import AddNewCustomerPage, LogoutPage
 from Config.configuration import Config
 
 @pytest.fixture(scope="module")
 def driver_setup():
-    driver = webdriver.Chrome()
-    driver.implicitly_wait(20)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (to avoid errors in headless mode)
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.implicitly_wait(30)
     driver.maximize_window()
     yield driver
     driver.quit()
@@ -24,9 +30,9 @@ def login(driver_setup):
 
 @pytest.fixture(scope="module")
 def add_customer_page(driver_setup, login):
-    # After login, navigate to add-customer page
-    driver_setup.get(Config.ADD_CUSTOMER_PAGE_URL)
+    # DO NOT navigate to any URL
     return AddNewCustomerPage(driver_setup)
+
 
 @pytest.fixture(scope="module")
 def logout_page(driver_setup):
@@ -39,16 +45,15 @@ def test_login_page_on_automation_play_ground_website(login):
 
 def test_add_customer_and_logout(add_customer_page, logout_page):
     add_customer_page.click_new_customer_button()
-    add_customer_page.enter_email("test@example.com")
-    add_customer_page.enter_first_name("Epitope")
-    add_customer_page.enter_last_name("Bell")
-    add_customer_page.enter_city("New York")
-    add_customer_page.enter_state("Maryland")
+    add_customer_page.enter_email(Config.EMAIL)
+    add_customer_page.enter_first_name(Config.FIRST_NAME)
+    add_customer_page.enter_last_name(Config.LAST_NAME)
+    add_customer_page.enter_city(Config.CITY)
+    add_customer_page.enter_state(Config.STATE)
     add_customer_page.click_gender()
-    add_customer_page.click_add_to_promotional_list()
+    add_customer_page.tick_promotional_checkbox()
+    #click submit
+    add_customer_page.click_submit()
 
-    add_customer_page.click_submit_button()
-
-    # Add asserts here
 
     logout_page.click_log_out()
