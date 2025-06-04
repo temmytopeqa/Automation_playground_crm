@@ -19,7 +19,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'  # Specify your Python version here
+          python-version: '3.11'  # Use a stable version like 3.11 unless 3.13 is required
+
+      - name: Install Chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
 
       - name: Install dependencies
         run: |
@@ -28,10 +38,11 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-html
 
-      - name: Run tests
+      - name: Run tests with xvfb
         run: |
+          sudo apt-get install -y xvfb
           source venv/bin/activate
-          pytest --html=report.html -p no:warnings
+          xvfb-run pytest --html=report.html -p no:warnings
 
       - name: Upload HTML report
         if: always()
@@ -39,3 +50,4 @@ jobs:
         with:
           name: pytest-report
           path: report.html
+
